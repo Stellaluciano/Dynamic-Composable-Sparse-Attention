@@ -1,0 +1,22 @@
+model_type: baseline
+model:
+  vocab_size: 128
+  max_seq_len: 32
+  d_model: 64
+  n_heads: 4
+  n_layers: 2
+  dropout: 0.0
+  top_k: 8
+  use_context_gate: true
+train:
+  dataset: pattern
+  n_samples: 256
+  batch_size: 16
+  lr: 0.001
+  steps: 20
+  device: cpu
+eval:
+  dataset: pattern
+  n_samples: 128
+  batch_size: 16
+  device: cpu
