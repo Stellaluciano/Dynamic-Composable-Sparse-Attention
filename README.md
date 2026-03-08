@@ -25,20 +25,20 @@ Transformers often spend most attention compute on tokens and heads that contrib
 
 ```mermaid
 flowchart TD
-    A[Input Sequence] --> B[Embedding Layer]
-    B --> C[Stacked DCSA Blocks]
-    C --> D[Final Norm]
-    D --> E[LM Head]
+    A["Input Sequence"] --> B["Embedding Layer"]
+    B --> C["Stacked DCSA Blocks"]
+    C --> D["Final Norm"]
+    D --> E["LM Head"]
 
-    subgraph DB[DCSA Block]
-      H[Hidden States]
-      R[Token Router]
-      S[Sparse Token Selection]
-      Q[QKV Projection]
-      M[Sparse Multi-Head Attention]
-      Cmp[Dynamic Head Composition]
-      G[Context Gate]
-      O[Residual + Output Projection]
+    subgraph DB["DCSA Block"]
+      H["Hidden States"]
+      R["Token Router"]
+      S["Sparse Token Selection"]
+      Q["QKV Projection"]
+      M["Sparse Multi-Head Attention"]
+      Cmp["Dynamic Head Composition"]
+      G["Context Gate"]
+      O["Residual + Output Projection"]
 
       H --> R --> S
       H --> Q
@@ -53,21 +53,29 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    H[Input hidden states H] --> QKV[Q = H * W_Q, K = H * W_K, V = H * W_V]
-    H --> RT[Token Router]
-    RT --> SC[s = Router(H)]
-    SC --> TK[S = TopK(s, k)]
-    QKV --> SA[Sparse attention over selected tokens]
+    H["Input hidden states H"] --> Q1["Q = H * W_Q"]
+    H --> K1["K = H * W_K"]
+    H --> V1["V = H * W_V"]
+
+    H --> RT["Token Router"]
+    RT --> SC["s = Router(H)"]
+    SC --> TK["S = TopK(s, k)"]
+
+    Q1 --> SA["Sparse attention over selected tokens"]
+    K1 --> SA
+    V1 --> SA
     TK --> SA
-    SA --> HO[Per-head outputs]
-    H --> CN[Composition network]
-    CN --> AW[alpha = softmax(MLP(pool(H)))]
-    HO --> CP[Head composition]
+
+    SA --> HO["Per-head outputs"]
+    H --> CN["Composition network"]
+    CN --> AW["alpha = softmax(MLP(pool(H)))"]
+    HO --> CP["Head composition"]
     AW --> CP
-    CP --> O[O = sum_h alpha_h * Head_h]
-    H --> CG[Context gate]
+
+    CP --> O["O = sum_h alpha_h * Head_h"]
+    H --> CG["Context gate"]
     O --> CG
-    CG --> Y[Y = g * O + (1 - g) * H]
+    CG --> Y["Y = g * O + (1 - g) * H"]
 ```
 
 ## Mathematical Formulation
